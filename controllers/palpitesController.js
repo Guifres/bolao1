@@ -1,4 +1,4 @@
-const db = require('../database');
+import supabase from './supabase';
 
 // Registrar palpite
 const registrarPalpite = (req, res) => {

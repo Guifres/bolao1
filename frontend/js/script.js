@@ -1,6 +1,4 @@
-// Referências do DOM
-const form = document.getElementById("form-palpites");
-const listaResultados = document.getElementById("lista-resultados");
+import supabase from './supabase';
 
 // Função para registrar o palpite com pagamento
 form.addEventListener("submit", async (event) => {
@@ -28,8 +26,9 @@ form.addEventListener("submit", async (event) => {
   const dados = {
     nome,
     telefone,
-    palpites
+    palpites: JSON.stringify(palpites)
   };
+
 
   // Função para realizar o pagamento antes de registrar o palpite
   async function realizarPagamento() {
@@ -56,31 +55,26 @@ form.addEventListener("submit", async (event) => {
   // Função para registrar o palpite
   async function registrarPalpite() {
     try {
-      const response = await fetch("http://localhost:5000/palpites/registrar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dados),
-      });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert("Palpite registrado com sucesso!");
-        form.reset();  // Limpa o formulário após o envio
-        getResultados();  // Atualiza a lista de resultados
-      } else {
-        alert("Erro ao registrar palpite. Tente novamente.");
+      const {data, error} = await supabase
+        .from('palpites')
+        .insert([dados]);
+      
+      if (error) {
+        throw error;
       }
-    } catch (error) {
-      console.error("Erro:", error);
-      alert("Erro na comunicação com o servidor.");
-    }
-  }
 
+      alert("Palpite registrado com sucesso")
+      form.reset();
+      getResultados();
+
+    } catch (error) {
+      console.error("Erro ao registrar palpite", error);
+      alert("Erro ao registrar palpite.Tente novamente")
+    }
   // Chama a função de pagamento antes de registrar o palpite
   realizarPagamento();
-});
+  };
 
 // Função para buscar os vencedores
 let vencedoresOrdenados = []; // Armazena os vencedores para pesquisa
@@ -139,4 +133,5 @@ function filtrarVencedores() {
 
 // Chama a função quando o conteúdo da página for carregado
 document.addEventListener('DOMContentLoaded', obterVencedores);
+})
 
