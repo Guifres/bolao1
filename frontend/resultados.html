@@ -47,37 +47,41 @@
 
     <script>
         async function obterVencedores() {
-            try {
-                const response = await fetch('http://localhost:5000/palpites/vencedores');
-                const data = await response.json();
+    try {
+        const response = await fetch('http://localhost:5000/palpites/vencedores');
+        const data = await response.json();
 
-                const vencedoresDiv = document.getElementById('vencedores');
-                const erroDiv = document.getElementById('erro');
-                vencedoresDiv.innerHTML = '';  // Limpar o conteúdo anterior
-                erroDiv.innerHTML = ''; // Limpar erro anterior
+        // Exibe os dados para verificação
+        console.log('Dados recebidos:', data);
 
-                if (data.vencedores && data.vencedores.length > 0) {
-                    data.vencedores.forEach(vencedor => {
-                        const vencedorDiv = document.createElement('div');
-                        vencedorDiv.classList.add('vencedor');
-                        vencedorDiv.innerHTML = `
-                            <span><strong>Nome:</strong> ${vencedor.nome}</span>
-                            <span><strong>Telefone:</strong> ${vencedor.telefone}</span>
-                            <span><strong>Pontos:</strong> ${vencedor.pontos}</span>
-                        `;
-                        vencedoresDiv.appendChild(vencedorDiv);
-                    });
-                } else {
-                    erroDiv.innerHTML = 'Nenhum vencedor encontrado.';
-                }
-            } catch (error) {
-                console.error('Erro ao obter vencedores:', error);
-                document.getElementById('erro').innerHTML = 'Erro ao obter os vencedores. Tente novamente mais tarde.';
-            }
+        const vencedoresDiv = document.getElementById('vencedores');
+        const erroDiv = document.getElementById('erro');
+        vencedoresDiv.innerHTML = '';  // Limpar o conteúdo anterior
+        erroDiv.innerHTML = ''; // Limpar erro anterior
+
+        if (data && Array.isArray(data.vencedores) && data.vencedores.length > 0) {
+            data.vencedores.forEach(vencedor => {
+                const vencedorDiv = document.createElement('div');
+                vencedorDiv.classList.add('vencedor');
+                vencedorDiv.innerHTML = `
+                    <span><strong>Nome:</strong> ${vencedor.nome}</span><br>
+                    <span><strong>Pontos:</strong> ${vencedor.pontos}</span><hr>
+                `;
+                vencedoresDiv.appendChild(vencedorDiv);
+            });
+        } else {
+            erroDiv.innerHTML = 'Nenhum vencedor encontrado.';
         }
+    } catch (error) {
+        console.error('Erro ao obter vencedores:', error);
+        document.getElementById('erro').innerHTML = 'Erro ao obter os vencedores. Tente novamente mais tarde.';
+    }
+}
 
-        // Chama a função para obter os vencedores assim que a página for carregada
-        document.addEventListener('DOMContentLoaded', obterVencedores);
+// Chama a função quando o conteúdo da página for carregado
+document.addEventListener('DOMContentLoaded', obterVencedores);
+
+
     </script>
 
 </body>

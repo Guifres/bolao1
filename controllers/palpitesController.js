@@ -1,5 +1,6 @@
 const db = require('../database');
 
+// Registrar palpite
 const registrarPalpite = (req, res) => {
     const { nome, telefone, palpites } = req.body;
 
@@ -7,7 +8,10 @@ const registrarPalpite = (req, res) => {
         return res.status(400).json({ mensagem: 'Dados incompletos.' });
     }
 
-    const query = `INSERT INTO palpites (nome, telefone, palpites) VALUES ($1, $2, $3) RETURNING *`;
+    // Inserir todos os palpites em um único campo JSON
+    const query = `INSERT INTO palpites (nome, telefone, palpites) 
+                   VALUES ($1, $2, $3) RETURNING *`;
+    
     const values = [nome, telefone, JSON.stringify(palpites)];
 
     db.query(query, values, (err, result) => {
@@ -20,6 +24,7 @@ const registrarPalpite = (req, res) => {
     });
 };
 
+// Listar todos os palpites
 const listarPalpites = (req, res) => {
     const query = `SELECT * FROM palpites`;
 
@@ -33,23 +38,17 @@ const listarPalpites = (req, res) => {
             id: row.id,
             nome: row.nome,
             telefone: row.telefone,
-            palpites: JSON.parse(row.palpites),
+            palpites: row.palpites, // Agora é um JSON
             data: row.data
         })));
     });
 };
 
+// Validar palpites
 const validarPalpites = async (req, res) => {
     try {
-        // Buscar resultados da última rodada
-        const resultadoJogos = await db.query('SELECT resultados FROM resultados_rodada ORDER BY data DESC LIMIT 1');
-
-        // Certifique-se de que 'resultadoJogos.rows[0].resultados' é um objeto
-        const jogos = resultadoJogos.rows[0].resultados;
-
-        // Se 'resultados' for uma string JSON, use JSON.parse() para convertê-lo
-        // Caso contrário, se já for um objeto, não faça nada
-        const jogosParsed = typeof jogos === 'string' ? JSON.parse(jogos) : jogos;
+        // Buscar todos os resultados da rodada
+        const resultadosRodada = await db.query('SELECT * FROM resultado'); // Aqui deve ser a tabela de resultados, onde a estrutura será { time1, gols_time1, time2, gols_time2 }
 
         // Buscar todos os palpites registrados
         const palpitesRegistrados = await db.query('SELECT * FROM palpites');
@@ -57,25 +56,35 @@ const validarPalpites = async (req, res) => {
         let vencedores = [];
 
         palpitesRegistrados.rows.forEach(palpite => {
-            const palpitesUsuario = JSON.parse(palpite.palpites);
             let pontos = 0;
 
+            // Extrair os palpites (JSON) para o usuário
+            const palpitesUsuario = palpite.palpites;
+
             // Comparar cada jogo com o palpite do usuário
-            jogosParsed.forEach(jogo => {
-                const [time1, time2] = Object.keys(jogo);
-                const resultadoTime1 = parseInt(jogo[time1]);
-                const resultadoTime2 = parseInt(jogo[time2]);
+            resultadosRodada.rows.forEach(jogo => {
+                const resultadoTime1 = jogo.gols_time1;
+                const resultadoTime2 = jogo.gols_time2;
+                const time1 = jogo.time1;
+                const time2 = jogo.time2;
+
+                // Extrair os palpites do usuário para o jogo atual
+                const palpiteTime1 = palpitesUsuario.find(p => p[time1] !== undefined)[time1];
+                const palpiteTime2 = palpitesUsuario.find(p => p[time2] !== undefined)[time2];
+
+                if (isNaN(palpiteTime1) || isNaN(palpiteTime2)) {
+                    return; // Ignora palpites inválidos
+                }
 
                 // Verificando se o usuário acertou o placar exato
-                if (palpitesUsuario[time1] === resultadoTime1 && palpitesUsuario[time2] === resultadoTime2) {
-                    pontos += 3;  // 3 pontos para o placar exato
-                }
-                // Verificando se o usuário acertou apenas o vencedor
-                else if (
-                    (resultadoTime1 > resultadoTime2 && palpitesUsuario[time1] > palpitesUsuario[time2]) ||
-                    (resultadoTime2 > resultadoTime1 && palpitesUsuario[time2] > palpitesUsuario[time1])
+                if (parseInt(palpiteTime1) === resultadoTime1 && parseInt(palpiteTime2) === resultadoTime2) {
+                    pontos += 3; // Placar exato = 3 pontos
+                } else if (
+                    (resultadoTime1 > resultadoTime2 && parseInt(palpiteTime1) > parseInt(palpiteTime2)) ||  // Acertou vencedor do time1
+                    (resultadoTime2 > resultadoTime1 && parseInt(palpiteTime2) > parseInt(palpiteTime1)) ||  // Acertou vencedor do time2
+                    (resultadoTime1 === resultadoTime2 && parseInt(palpiteTime1) === parseInt(palpiteTime2))  // Acertou empate sem placar exato
                 ) {
-                    pontos += 1;  // 1 ponto para acertar o vencedor
+                    pontos += 1; // Acertou vencedor ou empate = 1 ponto
                 }
             });
 
@@ -86,15 +95,11 @@ const validarPalpites = async (req, res) => {
         // Ordenar os vencedores por pontos, do maior para o menor
         vencedores.sort((a, b) => b.pontos - a.pontos);
 
-        // Retornar a lista dos vencedores
         res.status(200).json({ vencedores });
     } catch (error) {
         console.error('Erro ao validar palpites:', error);
         res.status(500).json({ mensagem: 'Erro ao validar palpites.' });
     }
 };
-
-
-
 
 module.exports = { registrarPalpite, listarPalpites, validarPalpites };
