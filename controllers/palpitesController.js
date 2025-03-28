@@ -1,27 +1,47 @@
 import supabase from './supabase';
 
 // Registrar palpite
-const registrarPalpite = (req, res) => {
+const { createClient } = require('@supabase/supabase-js');
+
+// Substitua com os seus dados do Supabase
+const supabaseUrl = 'https://rptqhlwtghvwwksvheab.supabase.co'; // URL do seu projeto
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwdHFobHd0Z2h2d3drc3ZoZWFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxOTE0MDUsImV4cCI6MjA1ODc2NzQwNX0.E8FEjh2uChJwNRVRSUYBVLr3h2KzQpcWh1FbXP9zE4U'; // Chave pública (anon)
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Função para registrar palpite
+const registrarPalpite = async (req, res) => {
     const { nome, telefone, palpites } = req.body;
 
+    // Verificando se os dados necessários foram fornecidos
     if (!nome || !telefone || !palpites) {
         return res.status(400).json({ mensagem: 'Dados incompletos.' });
     }
 
-    // Inserir todos os palpites em um único campo JSON
-    const query = `INSERT INTO palpites (nome, telefone, palpites) 
-                   VALUES ($1, $2, $3) RETURNING *`;
-    
-    const values = [nome, telefone, JSON.stringify(palpites)];
+    // Estrutura dos dados a serem inseridos
+    const dados = {
+        nome,
+        telefone,
+        palpite: JSON.stringify(palpites), // Converte os palpites para JSON
+    };
 
-    db.query(query, values, (err, result) => {
-        if (err) {
-            console.error('Erro ao registrar palpite:', err);
+    try {
+        // Inserir no Supabase
+        const { data, error } = await supabase
+            .from('palpites') // Nome da tabela no Supabase
+            .insert([dados]); // Inserir os dados no banco
+
+        if (error) {
+            console.error('Erro ao registrar palpite:', error);
             return res.status(500).json({ mensagem: 'Erro ao registrar palpite.' });
         }
 
-        res.json({ mensagem: 'Palpite registrado com sucesso!', palpite: result.rows[0] });
-    });
+        // Retorna o sucesso
+        return res.json({ mensagem: 'Palpite registrado com sucesso!', palpite: data[0] });
+
+    } catch (err) {
+        console.error('Erro inesperado:', err);
+        return res.status(500).json({ mensagem: 'Erro ao registrar palpite. Tente novamente.' });
+    }
 };
 
 // Listar todos os palpites
