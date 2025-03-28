@@ -13,46 +13,32 @@ form.addEventListener("submit", async (event) => {
   // Obtendo os valores dos inputs de gols para os palpites
   const palpites = [
     {
-      time1: 'Juventude',
-      gols_time1: document.getElementById("time1-gols").value,
-      time2: 'Vitória',
-      gols_time2: document.getElementById("time2-gols").value,
+      Juventude: document.getElementById("time1-gols").value,
+      ECVitoria: document.getElementById("time2-gols").value,
     },
     {
-      time1: 'Grêmio',
-      gols_time1: document.getElementById("time3-gols").value,
-      time2: 'Atlético-MG',
-      gols_time2: document.getElementById("time4-gols").value,
+      Gremio: document.getElementById("time3-gols").value,
+      AtleticoMG: document.getElementById("time4-gols").value,
     },
     {
-      time1: 'Cruzeiro',
-      gols_time1: document.getElementById("time5-gols").value,
-      time2: 'Mirassol',
-      gols_time2: document.getElementById("time6-gols").value,
+      Cruzeiro: document.getElementById("time5-gols").value,
+      Mirasol: document.getElementById("time6-gols").value,
     },
     {
-      time1: 'Botafogo',
-      gols_time1: document.getElementById("time7-gols").value,
-      time2: 'Palmeiras',
-      gols_time2: document.getElementById("time8-gols").value,
+      Palmeiras: document.getElementById("time7-gols").value,
+      Botafogo: document.getElementById("time8-gols").value,
     },
     {
-      time1: 'Bahia',
-      gols_time1: document.getElementById("time9-gols").value,
-      time2: 'Corinthians',
-      gols_time2: document.getElementById("time10-gols").value,
+      Bahia: document.getElementById("time9-gols").value,
+      Corinthians: document.getElementById("time10-gols").value,
     },
     {
-      time1: 'Fortaleza',
-      gols_time1: document.getElementById("time11-gols").value,
-      time2: 'Fluminense',
-      gols_time2: document.getElementById("time12-gols").value,
+      Fortaleza: document.getElementById("time11-gols").value,
+      Fluminense: document.getElementById("time12-gols").value,
     },
     {
-      time1: 'São Paulo',
-      gols_time1: document.getElementById("time13-gols").value,
-      time2: 'Sport Recife',
-      gols_time2: document.getElementById("time14-gols").value,
+      SaoPaulo: document.getElementById("time13-gols").value,
+      SportRecife: document.getElementById("time14-gols").value,
     },
     {
       time1: 'Flamengo',
@@ -61,16 +47,12 @@ form.addEventListener("submit", async (event) => {
       gols_time2: document.getElementById("time16-gols").value,
     },
     {
-      time1: 'Santos',
-      gols_time1: document.getElementById("time17-gols").value,
-      time2: 'Vasco da Gama',
-      gols_time2: document.getElementById("time18-gols").value,
+      VascodaGama: document.getElementById("time17-gols").value,
+      Santos: document.getElementById("time18-gols").value,
     },
     {
-      time1: 'Ceará',
-      gols_time1: document.getElementById("time19-gols").value,
-      time2: 'Bragantino',
-      gols_time2: document.getElementById("time20-gols").value,
+      Bragantino: document.getElementById("time19-gols").value,
+      Ceara: document.getElementById("time20-gols").value,
     },
   ];
 

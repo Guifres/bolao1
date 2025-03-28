@@ -68,6 +68,9 @@ const validarPalpites = async (req, res) => {
                 const time1 = jogo.time1;
                 const time2 = jogo.time2;
 
+                console.log(time1)
+                console.log(time2)
+
                 // Extrair os palpites do usuário para o jogo atual
                 const palpiteTime1 = palpitesUsuario.find(p => p[time1] !== undefined)[time1];
                 const palpiteTime2 = palpitesUsuario.find(p => p[time2] !== undefined)[time2];

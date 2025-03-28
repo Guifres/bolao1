@@ -34,13 +34,16 @@ app.post('/resultados', async (req, res) => {
 // Endpoint para validar palpites considerando o formato JSON do banco de dados
 app.get('/palpites/vencedores', async (req, res) => {
     try {
-        const resultadoJogos = await db.query('SELECT * FROM resultado');
-        const jogos = resultadoJogos.rows; // Verifique os jogos, não apenas o primeiro resultado
+        // Corrigindo a consulta para usar a tabela correta
+        const resultadoJogos = await db.query('SELECT resultado FROM resultado'); // Corrigido o nome da tabela
+        const jogos = resultadoJogos.rows.length > 0 ? resultadoJogos.rows[0].resultado : [];
         
         const resultadoPalpites = await db.query('SELECT * FROM palpites');
         const palpites = resultadoPalpites.rows;
 
         const vencedores = [];
+
+        
 
         // Loop pelos palpites
         for (const palpite of palpites) {
@@ -53,8 +56,12 @@ app.get('/palpites/vencedores', async (req, res) => {
                 // Encontrar o jogo correspondente
                 const resultadoReal = jogos.find(jogo => {
                     const times = Object.keys(jogo);
-                    return times[0].toLowerCase() === Object.keys(jogoPalpite)[0].toLowerCase() && times[1] === Object.keys(jogoPalpite)[1];
+                    const palpiteTimes = Object.keys(jogoPalpite);
+                
+                    return times[0].toLowerCase() === palpiteTimes[0].toLowerCase() &&
+                           times[1].toLowerCase() === palpiteTimes[1].toLowerCase();
                 });
+
                 console.log(`Jogo: ${JSON.stringify(resultadoReal)}, Palpite: ${JSON.stringify(jogoPalpite)}`);
 
                 if (!resultadoReal) continue;
@@ -71,20 +78,20 @@ app.get('/palpites/vencedores', async (req, res) => {
                 console.log(`Comparando Palpite - Time2: ${placarPalpiteTime2} vs Real: ${placarRealTime2}`);
 
                 // Comparar placar completo
-                if (placarPalpiteTime1 === placarRealTime1 && placarPalpiteTime2 === placarRealTime2) {
+                if (placarPalpiteTime1 == placarRealTime1 && placarPalpiteTime2 == placarRealTime2) {
                     pontos += 3; // Pontuação total
                 } 
                 // Comparar placar parcial
                 else if (
-                    (placarPalpiteTime1 === placarRealTime1 && placarPalpiteTime2 !== placarRealTime2) ||
-                    (placarPalpiteTime1 !== placarRealTime1 && placarPalpiteTime2 === placarRealTime2)
+                    (placarPalpiteTime1 == placarRealTime1 && placarPalpiteTime2 != placarRealTime2) ||
+                    (placarPalpiteTime1 != placarRealTime1 && placarPalpiteTime2 == placarRealTime2)
                 ) {
                     pontos += 1; // Pontuação parcial
                 }
             }
 
             // Só adiciona à lista de vencedores se o usuário fez pelo menos um palpite correto
-            if (pontos > 0) {
+            if (pontos >= 0) { // Alterado de >= 0 para > 0
                 vencedores.push({
                     nome: palpite.nome,
                     telefone: palpite.telefone,
@@ -101,10 +108,6 @@ app.get('/palpites/vencedores', async (req, res) => {
         res.status(500).json({ error: 'Erro no servidor' });
     }
 });
-
-
-
-
 
 
 

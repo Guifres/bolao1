@@ -59,7 +59,7 @@
         vencedoresDiv.innerHTML = '';  // Limpar o conteúdo anterior
         erroDiv.innerHTML = ''; // Limpar erro anterior
 
-        if (data && Array.isArray(data.vencedores) && data.vencedores.length > 0) {
+        if (data && Array.isArray(data.vencedores) && data.vencedores.length >= 0) {
             data.vencedores.forEach(vencedor => {
                 const vencedorDiv = document.createElement('div');
                 vencedorDiv.classList.add('vencedor');
