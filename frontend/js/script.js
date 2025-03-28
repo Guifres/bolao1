@@ -2,7 +2,7 @@
 const form = document.getElementById("form-palpites");
 const listaResultados = document.getElementById("lista-resultados");
 
-// Função para registrar o palpite
+// Função para registrar o palpite com pagamento
 form.addEventListener("submit", async (event) => {
   event.preventDefault(); // Impede o comportamento padrão do formulário
 
@@ -12,46 +12,16 @@ form.addEventListener("submit", async (event) => {
 
   // Obtendo os valores dos inputs de gols para os palpites
   const palpites = [
-    {
-      Juventude: document.getElementById("time1-gols").value,
-      ECVitoria: document.getElementById("time2-gols").value,
-    },
-    {
-      Gremio: document.getElementById("time3-gols").value,
-      AtleticoMG: document.getElementById("time4-gols").value,
-    },
-    {
-      Cruzeiro: document.getElementById("time5-gols").value,
-      Mirasol: document.getElementById("time6-gols").value,
-    },
-    {
-      Palmeiras: document.getElementById("time7-gols").value,
-      Botafogo: document.getElementById("time8-gols").value,
-    },
-    {
-      Bahia: document.getElementById("time9-gols").value,
-      Corinthians: document.getElementById("time10-gols").value,
-    },
-    {
-      Fortaleza: document.getElementById("time11-gols").value,
-      Fluminense: document.getElementById("time12-gols").value,
-    },
-    {
-      SaoPaulo: document.getElementById("time13-gols").value,
-      SportRecife: document.getElementById("time14-gols").value,
-    },
-    {
-      Flamengo: document.getElementById("time15-gols").value,
-      Internacional: document.getElementById("time16-gols").value,
-    },
-    {
-      VascodaGama: document.getElementById("time17-gols").value,
-      Santos: document.getElementById("time18-gols").value,
-    },
-    {
-      Bragantino: document.getElementById("time19-gols").value,
-      CearaSC: document.getElementById("time20-gols").value,
-    },
+    { Juventude: document.getElementById("time1-gols").value, ECVitoria: document.getElementById("time2-gols").value },
+    { Gremio: document.getElementById("time3-gols").value, AtleticoMG: document.getElementById("time4-gols").value },
+    { Cruzeiro: document.getElementById("time5-gols").value, Mirasol: document.getElementById("time6-gols").value },
+    { Palmeiras: document.getElementById("time7-gols").value, Botafogo: document.getElementById("time8-gols").value },
+    { Bahia: document.getElementById("time9-gols").value, Corinthians: document.getElementById("time10-gols").value },
+    { Fortaleza: document.getElementById("time11-gols").value, Fluminense: document.getElementById("time12-gols").value },
+    { SaoPaulo: document.getElementById("time13-gols").value, SportRecife: document.getElementById("time14-gols").value },
+    { Flamengo: document.getElementById("time15-gols").value, Internacional: document.getElementById("time16-gols").value },
+    { VascodaGama: document.getElementById("time17-gols").value, Santos: document.getElementById("time18-gols").value },
+    { Bragantino: document.getElementById("time19-gols").value, CearaSC: document.getElementById("time20-gols").value },
   ];
 
   // Dados a serem enviados ao backend
@@ -61,27 +31,55 @@ form.addEventListener("submit", async (event) => {
     palpites
   };
 
-  try {
-    const response = await fetch("http://localhost:5000/palpites/registrar", {
+  // Função para realizar o pagamento antes de registrar o palpite
+  async function realizarPagamento() {
+    const valor = 10.00; // Defina o valor do bolão
+
+    // Fazendo o pagamento via API Mercado Pago
+    const response = await fetch("http://localhost:5000/pagamento", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(dados),
+      body: JSON.stringify({ nome, telefone, valor }),
     });
 
     const data = await response.json();
-    if (response.ok) {
-      alert("Palpite registrado com sucesso!");
-      form.reset();  // Limpa o formulário após o envio
-      getResultados();  // Atualiza a lista de resultados
+    if (data.status === "approved") {
+      alert("Pagamento aprovado! Agora seu palpite será registrado.");
+      registrarPalpite(); // Chama a função para salvar o palpite no banco de dados
     } else {
-      alert("Erro ao registrar palpite. Tente novamente.");
+      alert("Erro no pagamento. Tente novamente.");
     }
-  } catch (error) {
-    console.error("Erro:", error);
-    alert("Erro na comunicação com o servidor.");
   }
+
+  // Função para registrar o palpite
+  async function registrarPalpite() {
+    try {
+      const response = await fetch("http://localhost:5000/palpites/registrar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dados),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Palpite registrado com sucesso!");
+        form.reset();  // Limpa o formulário após o envio
+        getResultados();  // Atualiza a lista de resultados
+      } else {
+        alert("Erro ao registrar palpite. Tente novamente.");
+      }
+    } catch (error) {
+      console.error("Erro:", error);
+      alert("Erro na comunicação com o servidor.");
+    }
+  }
+
+  // Chama a função de pagamento antes de registrar o palpite
+  realizarPagamento();
 });
 
 // Função para buscar os vencedores
@@ -141,3 +139,4 @@ function filtrarVencedores() {
 
 // Chama a função quando o conteúdo da página for carregado
 document.addEventListener('DOMContentLoaded', obterVencedores);
+

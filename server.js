@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const palpitesRoutes = require('./routes/palpites');
+const mercadopago = require("mercadopago")
 const pagamentosRoutes = require('./routes/pagamentos');
 const db = require('./database');  // Conexão com PostgreSQL
 
@@ -13,6 +14,46 @@ app.use(express.json());
 
 app.use('/palpites', palpitesRoutes);
 app.use('/pagamentos', pagamentosRoutes);
+
+
+// configurando as credenciais do Mercado Pago
+mercadopago.configure({
+    acess_token: "APP_USR-7376511829471442-032722-71e5c2bb8c14bf105afc7a0d872a6547-234082704"
+});
+
+// Rota para criar apgamneto
+app.post("pagamento", async (req, res) => {
+    const{ nome, telefone, valor } = req.body; //pegando os dados enviados
+
+    const pagamento = {
+        transaction_amount: parseint(valor),
+        descripyion: "Pagamento do bolão",
+        payment_method_id: "pix",
+        payer: {
+            email:"emaildopagador@email.com",
+            first_name: nome,
+            last_name:"",
+            identification:{
+                type:"CPF",
+                number: telefone,
+
+            },
+        },
+    }
+
+    try {
+        const pagamentoCriado = await mercadopago.payment.create(pagamento);
+        res.json(pagamentoCriado.body);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: "Erro ao processar pagamento" });
+      }
+    });
+    
+    // Iniciar o servidor
+    app.listen(5000, () => {
+      console.log("Servidor rodando na porta 5000");
+});
 
 // 🔥 Endpoint para cadastrar resultados manualmente
 app.post('/resultados', async (req, res) => {
