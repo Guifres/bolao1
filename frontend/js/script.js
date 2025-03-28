@@ -41,10 +41,8 @@ form.addEventListener("submit", async (event) => {
       SportRecife: document.getElementById("time14-gols").value,
     },
     {
-      time1: 'Flamengo',
-      gols_time1: document.getElementById("time15-gols").value,
-      time2: 'Internacional',
-      gols_time2: document.getElementById("time16-gols").value,
+      Flamengo: document.getElementById("time15-gols").value,
+      Internacional: document.getElementById("time16-gols").value,
     },
     {
       VascodaGama: document.getElementById("time17-gols").value,
@@ -52,7 +50,7 @@ form.addEventListener("submit", async (event) => {
     },
     {
       Bragantino: document.getElementById("time19-gols").value,
-      Ceara: document.getElementById("time20-gols").value,
+      CearaSC: document.getElementById("time20-gols").value,
     },
   ];
 
@@ -87,41 +85,59 @@ form.addEventListener("submit", async (event) => {
 });
 
 // Função para buscar os vencedores
+let vencedoresOrdenados = []; // Armazena os vencedores para pesquisa
+
+// Função para buscar os vencedores do servidor
 async function obterVencedores() {
   try {
-      const response = await fetch('http://localhost:5000/palpites/vencedores');
-      const data = await response.json();
+    const response = await fetch('http://localhost:5000/palpites/vencedores');
+    const data = await response.json();
 
-      // Exibe os dados para verificação
-      console.log('Dados recebidos:', data);
+    const vencedoresLista = document.getElementById('vencedores-lista');
+    const erroDiv = document.getElementById('erro');
+    vencedoresLista.innerHTML = '';  // Limpar a lista anterior
+    erroDiv.innerHTML = ''; // Limpar erro anterior
 
-      const vencedoresDiv = document.getElementById('vencedores');
-      const erroDiv = document.getElementById('erro');
-      vencedoresDiv.innerHTML = '';  // Limpar o conteúdo anterior
-      erroDiv.innerHTML = ''; // Limpar erro anterior
-
-      if (data && Array.isArray(data.vencedores) && data.vencedores.length > 0) {
-          data.vencedores.forEach(vencedor => {
-              const vencedorDiv = document.createElement('div');
-              vencedorDiv.classList.add('vencedor');
-              vencedorDiv.innerHTML = `
-                  <span><strong>Nome:</strong> ${vencedor.nome}</span><br>
-                  <span><strong>Pontos:</strong> ${vencedor.pontos}</span><hr>
-              `;
-              vencedoresDiv.appendChild(vencedorDiv);
-          });
-      } else {
-          erroDiv.innerHTML = 'Nenhum vencedor encontrado.';
-      }
+    if (data && Array.isArray(data.vencedores) && data.vencedores.length > 0) {
+      // Ordenar vencedores por pontos de forma decrescente
+      vencedoresOrdenados = data.vencedores.sort((a, b) => b.pontos - a.pontos);
+      exibirVencedores(vencedoresOrdenados);
+    } else {
+      erroDiv.innerHTML = 'Nenhum vencedor encontrado.';
+    }
   } catch (error) {
-      console.error('Erro ao obter vencedores:', error);
-      document.getElementById('erro').innerHTML = 'Erro ao obter os vencedores. Tente novamente mais tarde.';
+    console.error('Erro ao obter vencedores:', error);
+    document.getElementById('erro').innerHTML = 'Erro ao obter os vencedores. Tente novamente mais tarde.';
   }
+}
+
+// Função para exibir os vencedores na tela
+function exibirVencedores(lista) {
+  const vencedoresLista = document.getElementById('vencedores-lista');
+  vencedoresLista.innerHTML = ''; // Limpa a lista antes de atualizar
+
+  lista.forEach((vencedor, index) => {
+    const vencedorItem = document.createElement('li');
+    vencedorItem.classList.add('vencedor');
+    vencedorItem.innerHTML = `
+      <strong>Posição ${index + 1}:</strong> ${vencedor.nome} - ${vencedor.pontos} pontos
+    `;
+    vencedoresLista.appendChild(vencedorItem);
+  });
+}
+
+// Função para filtrar os vencedores pelo nome digitado
+function filtrarVencedores() {
+  const termoPesquisa = document.getElementById('pesquisa-nome').value.toLowerCase();
+  
+  // Filtra a lista com base no nome digitado
+  const listaFiltrada = vencedoresOrdenados.filter(vencedor => 
+    vencedor.nome.toLowerCase().includes(termoPesquisa)
+  );
+
+  // Exibe a lista filtrada
+  exibirVencedores(listaFiltrada);
 }
 
 // Chama a função quando o conteúdo da página for carregado
 document.addEventListener('DOMContentLoaded', obterVencedores);
-
-
-
-

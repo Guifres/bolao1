@@ -92,3 +92,77 @@ li {
   margin-bottom: 5px;
   border-radius: 4px;
 }
+
+.vencedores {
+  margin-top: 30px;
+}
+.vencedor {
+  background-color: #fff;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+.vencedor span {
+  display: block;
+  margin-bottom: 5px;
+}
+.vencedor span strong {
+  color: #2c3e50;
+}
+.erro {
+  color: red;
+  text-align: center;
+  font-weight: bold;
+}
+
+#vencedores-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.vencedor {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.vencedor:hover {
+  background-color: #f1f1f1;
+}
+
+#pesquisa-nome {
+  padding: 5px;
+  margin-bottom: 10px;
+  width: 80%;
+}
+
+button {
+  padding: 5px 10px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+#vencedores-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.vencedor {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.vencedor:hover {
+  background-color: #f1f1f1;
+}
+
+

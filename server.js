@@ -73,21 +73,24 @@ app.get('/palpites/vencedores', async (req, res) => {
 
                 const placarRealTime1 = resultadoReal[time1];
                 const placarRealTime2 = resultadoReal[time2];
-
                 console.log(`Comparando Palpite - Time1: ${placarPalpiteTime1} vs Real: ${placarRealTime1}`);
                 console.log(`Comparando Palpite - Time2: ${placarPalpiteTime2} vs Real: ${placarRealTime2}`);
+                
 
                 // Comparar placar completo
                 if (placarPalpiteTime1 == placarRealTime1 && placarPalpiteTime2 == placarRealTime2) {
                     pontos += 3; // Pontuação total
+                    console.log(pontos)
                 } 
-                // Comparar placar parcial
-                else if (
-                    (placarPalpiteTime1 == placarRealTime1 && placarPalpiteTime2 != placarRealTime2) ||
-                    (placarPalpiteTime1 != placarRealTime1 && placarPalpiteTime2 == placarRealTime2)
-                ) {
-                    pontos += 1; // Pontuação parcial
+                else if (placarPalpiteTime1 > placarPalpiteTime2 && placarRealTime1 > placarRealTime2) {
+                    pontos ++
+                    console.log(pontos)
+                } else if (placarPalpiteTime2 > placarPalpiteTime1 && placarRealTime2 > placarRealTime1){
+                    pontos ++
+                    console.log(pontos)
                 }
+                
+                // Comparar placar parcial
             }
 
             // Só adiciona à lista de vencedores se o usuário fez pelo menos um palpite correto
@@ -98,6 +101,7 @@ app.get('/palpites/vencedores', async (req, res) => {
                     pontos,
                 });
             }
+    
         }
 
         // Retorna a lista de vencedores

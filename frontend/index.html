@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bolão de Futebol</title>
+  <title>Bolão online</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Bolão de Futebol</h1>
+    <h1>Bolão Online</h1>
 
     <div class="form-palpi">
       <h2>Registrar Palpite</h2>
@@ -192,8 +192,17 @@
     </div>
     <h2>Resultado da Rodada 1</h2>
     <button onclick="obterVencedores()">Ver Resultados</button>
-    <div id="vencendores" class="vencedores">
+    <div id="vencedores" class="vencedores">
     <div id="erro" name="erro"></div>
+
+    <input type="text" id="pesquisa-nome" placeholder="Digite seu nome para buscar...">
+    <button onclick="filtrarVencedores()">Buscar</button>
+
+    <div id="vencedores-container" style="max-height: 400px; overflow-y: auto;">
+      <ul id="vencedores-lista"></ul>
+    </div>
+    <div id="erro"></div>
+    
     </div>
   </div>
 
