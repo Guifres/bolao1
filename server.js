@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const palpitesRoutes = require('./routes/palpites');
 const mercadopago = require("mercadopago")
 const pagamentosRoutes = require('./routes/pagamentos');
-const db = require('./database');  // Conexão com PostgreSQL
+const db = require('./backend/config/database');  // Conexão com PostgreSQL
 
 dotenv.config();
 
