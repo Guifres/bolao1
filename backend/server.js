@@ -1,10 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const palpitesRoutes = require('./routes/palpites');
-const mercadopago = require("mercadopago")
-const pagamentosRoutes = require('../routes/pagamentos');
-const db = require('./config/database');  // Conexão com PostgreSQL
+import express from 'express';
+import cors from'cors';
+import dotenv from 'dotenv';
+import palpitesRoutes from './routes/palpites.js';
+const  mercadopago = require("mercadopago")
+import pagamentosRoutes from '../routes/pagamentos.js';
+import db from './config/database.js';  // Conexão com PostgreSQL
 import supabase from './config/database.js'; // Caminho correto do arquivo
 
 
