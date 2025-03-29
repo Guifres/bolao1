@@ -3,8 +3,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const palpitesRoutes = require('./routes/palpites');
 const mercadopago = require("mercadopago")
-const pagamentosRoutes = require('./routes/pagamentos');
-const db = require('./backend/config/database');  // Conexão com PostgreSQL
+const pagamentosRoutes = require('../routes/pagamentos');
+const db = require('./config/database');  // Conexão com PostgreSQL
+import supabase from './config/database.js'; // Caminho correto do arquivo
+
 
 dotenv.config();
 
@@ -49,11 +51,7 @@ app.post("pagamento", async (req, res) => {
         res.status(500).json({ erro: "Erro ao processar pagamento" });
       }
     });
-    
-    // Iniciar o servidor
-    app.listen(5000, () => {
-      console.log("Servidor rodando na porta 5000");
-});
+
 
 // 🔥 Endpoint para cadastrar resultados manualmente
 app.post('/resultados', async (req, res) => {
